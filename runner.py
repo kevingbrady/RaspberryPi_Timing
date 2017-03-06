@@ -19,6 +19,7 @@ while (datetime.datetime.now() <= time_end):
     if count > 2:  # start printing after 3 seconds to avoid 'None' irig reads
         print irig
     count += 1 
+    
     # Year = str(p.Year)
     # Month = str(p.Month)
     # Day = str(p.Day)
