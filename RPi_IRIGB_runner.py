@@ -8,7 +8,7 @@ sys.stdout = filename
 
 pin = 12
 time_end = datetime.datetime.now() + datetime.timedelta(hours=12)   #How long you want it to run
-time_end += datetime.timedelta(seconds=4)			     #it takes 3 seconds to start so add 4 seconds to get an even dataset
+time_end += datetime.timedelta(seconds=2)			     #it takes 2 seconds to start so add 2 seconds to get an even dataset
 p = IRIGB.Offset_Decoder()
 count = 0
 pi = ''
