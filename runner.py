@@ -18,8 +18,7 @@ while (datetime.datetime.now() <= time_end):
     irig = p.get_decoded_data(pin)
     if count > 2:  # start printing after 3 seconds to avoid 'None' irig reads
         print irig
-    count += 1
-
+    count += 1 
     # Year = str(p.Year)
     # Month = str(p.Month)
     # Day = str(p.Day)
