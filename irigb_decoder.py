@@ -3,7 +3,6 @@ import datetime
 import RPi.GPIO as GPIO
 import time
 
-
 class IRIGB_Decoder():
     daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     Seconds = 0.0
