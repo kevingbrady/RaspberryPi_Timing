@@ -34,7 +34,7 @@ class Offset_Decoder():
     def current_microseconds(self):                 # calculates current timestamp in microseconds
         current_microseconds = int(round(time.time() * 1000000))
         return current_microseconds
-
+    
     def pulse_microseconds(self, pin):              # reads in pulse and calculates the number of microseconds bewteen high and low input values
         ptime = 0
         starttime = self.current_microseconds()
