@@ -1,3 +1,6 @@
+# Will plot the CPU Temperature or GPU Temperature over time
+# Need to Change value for temp to GPU along with the name of the .png file and the graph title to GPU as well
+
 library(lubridate)
 dat <- read.table('Data.txt', sep = '|', strip.white = TRUE)
 pi_data <- dat
