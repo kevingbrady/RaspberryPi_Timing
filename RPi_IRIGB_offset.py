@@ -52,7 +52,7 @@ class Decoder():
         while GPIO.input(pin) == GPIO.HIGH:
 
             ptime = self.current_microseconds()
-            if(ptime - starttime) > 8300:               # if teh difference is greater than 8300 it is an error so break out of the loop
+            if(ptime - starttime) > 8300:               # if the difference is greater than 8300 it is an error so break out of the loop
 
                 break
 
@@ -199,8 +199,8 @@ class Decoder():
 
                 if self.piFlag != 1:
 
-                            self.pi = datetime.datetime.utcfromtimestamp(time.time())     # TIMESTAMP RASPBERRY PI
-                            self.piFlag = 1
+                            self.pi = datetime.datetime.utcfromtimestamp(time.time())     # TIMESTAMP RASPBERRY PI      
+                            self.piFlag = 1                                               # PiFlag ensures that it only timestamps once if there are multiple iterations through this part of the loop
 
                 if len(self.templist) > 70:                              # DECODE IRIGB
                                                                          # if the length of templist is greater than the minimum needed to decode a pulse then extract the bits that are not pointer bits and run the decoder method on the list
