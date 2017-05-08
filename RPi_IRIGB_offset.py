@@ -2,11 +2,10 @@
 import datetime
 import RPi.GPIO as GPIO
 import time
-import subprocess
 
 class Decoder():
 	
-    daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]        #List of the days in each month, used to calculate month and day from days of year
     Seconds = 0.0
     Minutes = 0
     Hours = 0
@@ -23,13 +22,12 @@ class Decoder():
     SBS = 0.0
     piFlag = 0
     pi = ''
-    total = 0
     clocktime = ''
-    templist = []
-    numbits = []
-    bits = []
+    templist = []                                   # list of bits including pointer bits
+    numbits = []                                    # list to keep tracj of the number of bits read in between each pointer bit
+    bits = []                                       # list of bits excluding pointer bits
     bitcount = 0
-    q = []
+    q = []                                          #queue to hold raw input values
 
     def __init__(self):
 
@@ -54,7 +52,7 @@ class Decoder():
         while GPIO.input(pin) == GPIO.HIGH:
 
             ptime = self.current_microseconds()
-            if(ptime - starttime) > 8300:
+            if(ptime - starttime) > 8300:               # if teh difference is greater than 8300 it is an error so break out of the loop
 
                 break
 
@@ -68,18 +66,18 @@ class Decoder():
     def bin_seconds_today(self, today):
 
         today = datetime.datetime.strptime(today, '%Y-%m-%d')
-        epoch = 0.0
+        epoch = 0.0                                                   # maximum and minimum values that "today" can be to avoid Overflow Errors
         max_year = 253402232400.0
 
         if epoch < today.timestamp() < max_year:
 
-            sec = today - datetime.datetime.fromtimestamp(epoch)
+            sec = today - datetime.datetime.fromtimestamp(epoch)         # calculate binary seconds of the current day based on the values read in from the decoder
             return sec.total_seconds()
       
     def irig_decoder(self, pulsebits):
 
-        third = (len(pulsebits)) - 63        
-        x = 0
+        third = (len(pulsebits)) - 63                                    # find where the third pointer bit is in the pulse and decode the rest of the values based on  
+        x = 0                                                            # where this bit is. This way the pulse can be missing up to 28 bits at the beginning and still decode properly
         self.Month = 0
         self.Day = 0
  
@@ -93,7 +91,7 @@ class Decoder():
         #self.Parity = str(pulsebits[third + 41])
         #self.CTQ = '(' + str(pulsebits[third + 42]) + str(pulsebits[third + 43]) + str(pulsebits[third + 44]) + ')'
 
-        if(self.Year % 4 == 0):
+        if(self.Year % 4 == 0):                       # check if it is a leap year and change daysInMonth accordingly
 
             if(self.Year % 100 != 0):
 
@@ -109,11 +107,11 @@ class Decoder():
 
         else:
 
-            self.daysInMonth[1] = 28
+            self.daysInMonth[1] = 28                   # since daysInMonth is a class variable you have to make sure that this gets reset
 
         self.Day = self.DaysOY
 
-        while(self.Month < 12):
+        while(self.Month < 12):                      # calculate month and day based on the number of days of the year
 
             self.Month += 1
 
@@ -131,18 +129,21 @@ class Decoder():
 
                 break
 
-        timestamp = self.bin_seconds_today(str(self.Year) + '-' + str(self.Month) + '-' + str(self.Day)) + self.SBS		
+	# get the total binary seconds of the current day and add it to the SBS decoded from the pulse to get a numerical timestamp.
+	# Convert this numerical timestamp to UTC format
+	
+        timestamp = self.bin_seconds_today(str(self.Year) + '-' + str(self.Month) + '-' + str(self.Day)) + self.SBS   		
         Time = datetime.datetime.utcfromtimestamp(timestamp)
         
         return Time
 
-    def reset(self):
+    def reset(self):                     # reset timestamp and decoded pulse placeholder varibles
 
-        self.piFlag = 0
+        self.piFlag = 0                
         self.total = 0
         self.clocktime = ''
 
-    def clearlists(self):
+    def clearlists(self):                # reset class list variables (and counter for number of bits)
 
         del self.templist[:]
         del self.bits[:]
@@ -151,7 +152,7 @@ class Decoder():
 
     def get_decoded_data(self, pin):
 
-        self.setup(pin)
+        self.setup(pin)                  # set up pin for input
         while True:
             
             microseconds = self.pulse_microseconds(pin)
@@ -160,8 +161,8 @@ class Decoder():
         
                 pass
 
-            elif(1000 <= microseconds <= 3000):
-
+            elif(1000 <= microseconds <= 3000):                          # assign value to bit based on the width of the pulse
+                                                                         # if bitcount is equal to 9 then it is supposed to be a pointer bit
                 if self.bitcount < 9:
                     self.templist.append(0)
                     self.bitcount += 1
@@ -181,7 +182,7 @@ class Decoder():
 
                     microseconds = 8000
 
-            elif(microseconds == 8000):
+            elif(microseconds == 8000):                                # append 2 to templist for a pointer bit, reset bitcount and append the number of bits between each pointer bit to numbits
 
                 self.templist.append(2)
                 self.numbits.append(self.bitcount)
@@ -189,20 +190,20 @@ class Decoder():
 
             if microseconds > 1:
 
-                self.q.append(microseconds)
+                self.q.append(microseconds)                         # add raw value to queue, delete first element if the length of the queue is greater than 100
                 if len(self.q) > 100:
 
                     del self.q[0]
             
-            if self.templist[-2:] == [2,2]:
+            if self.templist[-2:] == [2,2]:                      # if there are two pointer bits at the end of the list then it is the on-time reference bit
 
                 if self.piFlag != 1:
 
-                            self.pi = datetime.datetime.utcfromtimestamp(time.time())
+                            self.pi = datetime.datetime.utcfromtimestamp(time.time())     # TIMESTAMP RASPBERRY PI
                             self.piFlag = 1
 
-                if len(self.templist) > 70:
-                        
+                if len(self.templist) > 70:                              # DECODE IRIGB
+                                                                         # if the length of templist is greater than the minimum needed to decode a pulse then extract the bits that are not pointer bits and run the decoder method on the list
                     for i in self.templist:
 
                         if i == 0 or i == 1:
@@ -211,14 +212,14 @@ class Decoder():
 
                     self.clocktime = self.irig_decoder(self.bits)
                 
-                else:
+                else:                                                   # if the length of templist is smaller than the minimum than reset everything and start over
 
                     self.clearlists()
                     self.reset()
 
-            if self.clocktime != '':
+            if self.clocktime != '':                                    # if the decoder method decodes a value then break out of the loop
 
-                break
+                break        
 
                     
   
