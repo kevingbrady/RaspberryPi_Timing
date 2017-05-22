@@ -115,6 +115,8 @@ class Decoder():
                 if len(numbits) == 10:
 
                     numbits.append(0)
+		    if self.cyclelist[-1:] != [23]:
+			self.cyclelist[-1:] = [23]
 
                 else:
 
