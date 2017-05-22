@@ -94,7 +94,7 @@ class Decoder():
                 self.cyclelist.append(high)
 
             
-            if high < 23: 
+            if high < 21: 
 
                     if high < 2:
 
@@ -121,22 +121,24 @@ class Decoder():
                     numbits.append(bitcount)
                     bitcount = 0
            
-            if numbits[-1:] == [0]:
+	    if sum(self.cyclelist[-2:]) >= 40:
+			
+                if numbits[-1:] == [0]:
 
-                if piFlag != 1:
+                    if piFlag != 1:
 
-                    self.pi = datetime.datetime.utcfromtimestamp(time.time())
-                    piFlag = 1
+                        self.pi = datetime.datetime.utcfromtimestamp(time.time())
+                        piFlag = 1
 
 
-                if len(bits) > 63:
+                    if len(bits) > 63:
 
-                    clocktime = self.irig_decoder(bits)
+                        clocktime = self.irig_decoder(bits)
 
-                else:
+                    else:
 
-                    del bits[:]
+                        del bits[:]
     
-                del numbits[:]
-                return(clocktime)
+                    del numbits[:]
+                    return(clocktime)
 
