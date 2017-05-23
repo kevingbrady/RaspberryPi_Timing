@@ -20,7 +20,6 @@ p.setup(pin)
 count = 0
 irig = ''
 pi = ''
-count = 0
 prev = ''
 
 
