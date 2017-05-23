@@ -28,6 +28,7 @@ while datetime.datetime.now() <= time_end:
 
     pi = p.pi
     irig = p.get_decoded_data(pin)
+    CPUtemp = subprocess.check_output('./ReadCPUTemp')
     
     if count > 2:
 
@@ -42,9 +43,12 @@ while datetime.datetime.now() <= time_end:
 
             if irig != '':
 
-                print(irig, '|', pi, '|', float(p.CPUtemp[0:-1]))
+                print(irig, '|', pi, '|', float(CPUtemp[0:-1]))
 
-    del p.cyclelist[:]
+        else:
+            
+            irig = ''
+            
     prev = irig
     count += 1
 filename.close()
