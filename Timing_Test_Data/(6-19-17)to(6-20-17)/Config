@@ -1,0 +1,33 @@
+Time Ran: 12 hours
+
+Start: 2017-06-19 21:37:17
+
+End:  2017-06-20 09:37:17
+
+Overclocked: No
+
+Linux Version: Linux raspberrypi 4.9.24-v7+ #993 SMP Wed Apr 26 18:01:23 BST 2017 armv7l GNU/Linux
+
+OS: Raspbian GNU/Linux 8.0 (jessie)
+
+Pi Configuration: Headless
+
+Method for Syncing through NTP: NTPDate w/Cron (-b option added)
+
+Sync Frequency: NTP enabled
+
+Sync Before Start: Yes (~30s)
+
+Hardware: Oscilliquartz Grandmaster Clock -> Raspberry Pi GPIO
+
+pin number: 12
+
+pi IP: 129.6.60.67
+
+pi tag #: N109015
+
+run as root user: No
+
+NTP Service: Enabled
+NTP Daemon: Disabled
+
