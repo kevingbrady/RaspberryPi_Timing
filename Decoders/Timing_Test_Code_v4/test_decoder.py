@@ -49,7 +49,6 @@ class Decoder():
 
         high = 0
         last_high = 0
-        self.templist = []
         
         while 1:                          # read values into list until 2 reference bits are detected next to eachother.
                                           # Only append the 0s and 1s to templist and keep track of current value and previous value read from the pin to know when the end of the pulse comes up
@@ -73,4 +72,5 @@ class Decoder():
             last_high = high
 
         self.pi = time()        # timestamp pi
+        del self.templist[:]
         return((0, self.irig_decoder())[0 < self.irig_decoder() < 2147483641])  # return either a 0 or the timestamp calculated from the irig_decoder() method if the value returned from irig_decoder can be interpreted by the datetime module (prevents Overflow Error that will stop the code from running)
