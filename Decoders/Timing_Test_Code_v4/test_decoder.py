@@ -19,7 +19,7 @@ class Decoder():
 
         GPIO.wait_for_edge(pin, GPIO.RISING)            # block execution of code until rising edge is detected on pin
         start = default_timer()
-        GPIO.wait_for_edge(pin, GPIO.BOTH)              # block execution again until falling edge detected on pin
+        GPIO.wait_for_edge(pin, GPIO.FALLING)              # block execution again until falling edge detected on pin
         end = default_timer()
 
         return(self.interpret(round((end-start) * 1000000)))        # calculate number of microseconds based on the difference between the ending and starting timestamps, then send this value to the interpret function to get value of pulse
