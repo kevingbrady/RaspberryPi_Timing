@@ -19,7 +19,7 @@
 
 void *readcputemp(void *);
 void *decode_irigb(void *);
-void *printOutput(void *);
+void printOutput(void);
 void printArray(void);
 void interrupt_callback(void);
 
@@ -83,11 +83,12 @@ void interrupt_callback(void){
 
 				default:
 
-					if(endFlag == 1){
+					if(endFlag == 1){         //TAKE TIMESTAMP WHEN ON-TIME REFERENCE BIT IS SEEN
 
 						clock_gettime(CLOCK_REALTIME, &tp);
-						if((bitcount - bitArray) > 63){
+						if((bitcount - bitArray) > 63){  //IF THERE ARE ENOUGH BITS IN THE ARRAY TO DECODE A PULSE
 
+							//DECODE PULSE, TAKE CPU TEMPERATURE READING IN SEPARATE THREADS
 							pthread_t decode, out, cputemp;
 							pthread_create(&cputemp, NULL, readcputemp, NULL);
 							pthread_create(&decode, NULL, decode_irigb, NULL);
@@ -95,8 +96,9 @@ void interrupt_callback(void){
 							pthread_join(decode, NULL);
 							pthread_join(cputemp, NULL);
 
-							pthread_create(&out, NULL, printOutput, NULL);
-							pthread_join(out, NULL);
+							//WHEN PULSE IS DECODED AND CPU TEMPERATURE IS TAKEN PRINT OUTPUT IN SEPARATE THREAD
+
+							printOutput();
 						}
 						bitcount = bitArray;
 						//pullUpDnControl(PIN, PUD_DOWN);
@@ -106,16 +108,16 @@ void interrupt_callback(void){
 			}
 	start.tv_sec = start.tv_nsec = 0;
 	}
-	else if(digitalRead(PIN)){
+	else if(digitalRead(PIN)){                      //RISING EDGE
 
-		delay(0.2);
+		delay(0.2);    //DEBOUNCE PULSE
 		(digitalRead(PIN) && start.tv_sec == 0) ? clock_gettime(CLOCK_REALTIME, &start): 0;
 		end.tv_sec = end.tv_nsec = 0;
 
 	}
 }
 
-void *decode_irigb(void *arguments)
+void *decode_irigb(void *arguments)      //DECODE IRIGB PULSE IN SEPARATE THREAD
 {
 
 	DaysOY = (*(bitcount - 63) * 1) + (*(bitcount - 62) * 2) +  (*(bitcount - 61) * 4) + (*(bitcount - 60) * 8) + (*(bitcount - 58) * 10) + (*(bitcount - 57) * 20) + (*(bitcount - 56) *  40) + (*(bitcount - 55) * 80) + (*(bitcount - 54) * 100) + (*(bitcount - 53) * 200);
@@ -135,7 +137,7 @@ void *decode_irigb(void *arguments)
 	timestamp.tv_sec = (DaysOY + Year + Seconds_of_Day);
 }
 
-void *readcputemp(void *vargp)
+void *readcputemp(void *vargp)    //READ CPU BOARD TEMPERATURE IN SEPARATE THREAD
 {
 
 FILE *temperatureFile;
@@ -147,12 +149,12 @@ fclose (temperatureFile);
 cpu_temperature = T;
 }
 
-void *printOutput(void *vargp){
+void printOutput(void){    //PRINT OUTPUT 
 
 	strftime(next_pi_timestamp, sizeof(next_pi_timestamp), "%Y-%m-%d %H:%M:%S", gmtime(&tp.tv_sec));
 	strftime(irig, sizeof(irig), "%Y-%m-%d %H:%M:%S", gmtime(&timestamp.tv_sec));
 
-	if(strlen(current_pi_timestamp) != 0){
+	if(strlen(current_pi_timestamp) > 0){
 
 		//printf("%d \n", sizeof(current_pi_timestamp)/sizeof(char));
 //		((tp.tv_sec - timestamp.tv_sec) != 1) ? printArray(): 0;
@@ -167,7 +169,7 @@ void *printOutput(void *vargp){
 
 
 
-void printArray(void){
+void printArray(void){    //PRINT PULSE WIDTHS RECORDED FOR EACH PULSE IF USED (UNUSED BY DEFAULT)
 
 	int i;
 	for(i=0; i < (sizeof(pulseArray)/sizeof(int)); i++){
