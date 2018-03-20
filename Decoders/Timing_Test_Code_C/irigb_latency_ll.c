@@ -64,7 +64,7 @@ int main(){
 
 	setpriority(PRIO_PROCESS, 0, -20);         //SET HIGHEST PRIORITY POSSIBLE
 
-//        output = fopen("data.txt", "w+");        //CREATE OUTPUT FILE
+        output = fopen("data.txt", "w+");        //CREATE OUTPUT FILE
 	endtime = TOTAL + 2;
 	wiringPiSetupGpio();                       //SETUP WIRINGPI ON PIN
 	pinMode(PIN, INPUT);
@@ -189,14 +189,16 @@ void printOutput(void){          //Convert String Arrays to Datetimes and Print 
         strftime(irig, sizeof(irig), "%Y-%m-%d %H:%M:%S", gmtime(&timestamp.tv_sec));
 	if(endtime < TOTAL){   //Gives two seconds for the test to start before it records values (Ensures that a full irigb signal has been recorded before attempting to write output)
 
-		printf("%s | %s.%06u | %6.3f | %d%\n", irig, current_pi_timestamp, (tp.tv_nsec/1000), cpu_temperature, cpu_load);
-                //fprintf(output, "%s | %s.%06u | %6.3f \n", irig, current_pi_timestamp, (tp.tv_nsec/1000), cpu_temperature);
-                if(tp.tv_sec - last_pi_timestamp != 1.0){      //print list of pulse width values if the difference between the last two recorded raspberry pi timestamp values is more than 1 second
+		//printf("%s | %s.%06u | %6.3f | %d%\n", irig, current_pi_timestamp, (tp.tv_nsec/1000), cpu_temperature, cpu_load);
+		//Commenting out the line above will make the code print to the screen if you want to see it live. Below will write to the output file
+		
+                fprintf(output, "%s | %s.%06u | %6.3f | %d%\n", irig, current_pi_timestamp, (tp.tv_nsec/1000), cpu_temperature, cpu_load);
+                /*if(tp.tv_sec - last_pi_timestamp != 1.0){      //print list of pulse width values if the difference between the last two recorded raspberry pi timestamp values is more than 1 second
                                                                //This means it missed the end of an irigb signal
 
 			printList(&head2);
 
-		}
+		}*/
 	}
 	(timestamp.tv_sec > 0) ? timestamp.tv_sec += (tp.tv_sec - last_pi_timestamp): 0;     //Increase reference (irigb) timestamp value by the difference between the last 2 recorded raspberry pi timestamp values
 	last_pi_timestamp = tp.tv_sec;
