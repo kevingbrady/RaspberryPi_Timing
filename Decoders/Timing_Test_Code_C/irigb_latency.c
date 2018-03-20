@@ -38,7 +38,7 @@ long microsecs;
 
 int main(){
 
-//	setpriority(PRIO_PROCESS, 20, -20);
+	setpriority(PRIO_PROCESS, 0, -20);
 //	piHiPri(99);
 
 	endtime = time(NULL) + TOTAL + 2;
