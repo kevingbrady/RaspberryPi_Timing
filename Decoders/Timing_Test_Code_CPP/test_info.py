@@ -1,0 +1,36 @@
+import os
+import datetime
+
+test_file = open('data.txt', 'r')
+info_file = open('test_info.txt', 'w+')
+lines = test_file.readlines()
+test_file.close()
+start, first = lines[0].split('|', 1) 
+end, last = lines[-1].split('|', 1)
+time_ran = datetime.datetime.strptime(end.strip(), "%Y-%m-%d %H:%M:%S") - datetime.datetime.strptime(start.strip(), "%Y-%m-%d %H:%M:%S")
+
+LINUX_VERSION = os.popen("uname -a").read()
+OS = os.popen("cat /etc/os-release").read()
+CPU = os.popen("lscpu").read()
+NTP = os.popen("sudo service ntp status").read()
+CLAMAV = os.popen("sudo service clamav-freshclam status").read()
+AVAHI = os.popen("sudo service avahi-daemon status").read()
+POSTFIX = os.popen("sudo service postfix status").read()
+UFW = os.popen("sudo service ufw status").read()
+RSYSLOG = os.popen("sudo service rsyslog status").read()
+
+info_file.write("Timing Test Information\n")
+info_file.write('Time Ran: ' + str(time_ran) + '\n')
+info_file.write('Start: ' + start + '\n')
+info_file.write('End: ' + end + '\n')
+info_file.write('Linux Version: ' + str(LINUX_VERSION) + '\n') 
+info_file.write(str(OS) + '\n')
+info_file.write(str(CPU) + '\n')
+info_file.write(str(NTP[0:240]) + '\n\n')
+info_file.write(str(CLAMAV[0:260]) + '\n\n')
+info_file.write(str(AVAHI[0:260]) + '\n\n')
+info_file.write(str(POSTFIX[0:260]) + '\n\n')
+info_file.write(str(UFW[0:260]) + '\n\n')
+info_file.write(str(RSYSLOG[0:260]) + '\n\n')
+info_file.close()
+	
