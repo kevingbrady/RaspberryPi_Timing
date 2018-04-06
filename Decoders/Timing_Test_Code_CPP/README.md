@@ -1,19 +1,21 @@
-C++ Implementation of IRIGB Decoder
+## C++ Implementation of IRIGB Decoder
 
-Download and install wiringPi library with:
+# Download and install wiringPi library with:
 
 git clone git://git.drogon.net/wiringPi
 cd ~/wiringPi
 git pull
 ./build
 
-To Compile:
+# To Compile:
 
 g++ main.cpp -o irigb_cpp -lwiringPi -std=c++11 -pthread
 
-Run:
+# Run:
 
 sudo ./irigb_cpp  
+
+# Changes from C Implementation
 
 All the variables that are used to keep track of the test information are placed inside a single "Decoder" class so the memory
 is released upon program exit.
